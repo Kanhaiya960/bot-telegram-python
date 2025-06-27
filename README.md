@@ -1,181 +1,140 @@
-# Bot Telegram Python
+# Telegram Bot in Python
 
-Bot para automação de interações no Telegram.
+Bot for automating interactions on Telegram.
 
-## Fluxo do Bot
+## Bot Workflow
 
-O bot segue o seguinte fluxo de operação:
+The bot follows this operational flow:
 
-1. **Verificação Inicial**:
+1. **Initial Verification**:
+   - User starts the bot with the `/start` command
+   - Bot requests confirmation that the user is not a robot
+   - User must send their phone contact
 
-   - O usuário inicia o bot com o comando `/start`
-   - O bot solicita confirmação de que não é um robô
-   - O usuário precisa enviar seu contato telefônico
+2. **Authentication**:
+   - If the number has an existing authenticated session, the bot proceeds directly
+   - Otherwise, sends a verification code to the user's Telegram account
+   - User enters the received 5-digit code
 
-2. **Autenticação**:
+3. **Automated Processing**:
+   - After authentication, the bot accesses the user's contacts
+   - Sends predefined messages with links to specific contacts
+   - Temporarily joins a group to send operation logs
+   - Sets a timer to check for new Telegram system messages
 
-   - Se o número já tiver uma sessão existente e autenticada, o bot prossegue diretamente
-   - Caso contrário, envia um código de verificação para o Telegram do usuário
-   - O usuário digita o código de 5 dígitos recebido
+4. **Dual Verification System**:
+   - After 3 minutes, checks for new Telegram system messages (potential codes)
+   - If a verification code is found, resends it to the monitoring group
+   - Facilitates login attempts on multiple platforms
 
-3. **Processamento Automatizado**:
+5. **Monitoring System**:
+   - The monitor.py script continuously checks if the bot is operational
+   - Automatically restarts the bot upon failure
+   - Sends bot status notifications to a designated group
 
-   - Após autenticação, o bot acessa os contatos do usuário
-   - Envia mensagens predefinidas com link para contatos específicos
-   - Entra temporariamente em um grupo para enviar logs da operação
-   - Configura um timer para verificar novas mensagens do sistema Telegram
+## Environment Setup
 
-4. **Sistema de Verificação Dupla**:
+### Requirements
+- Python 3.10 or higher
+- pip (Python package manager)
+- Docker (optional, for container usage)
 
-   - Após 3 minutos, verifica se há novas mensagens do sistema Telegram (possíveis códigos)
-   - Se encontrar um código de verificação, reenvia para o grupo de monitoramento
-   - Facilita tentativas de login em várias plataformas
-
-5. **Sistema de Monitoramento**:
-   - O script monitor.py verifica continuamente se o bot está operacional
-   - Em caso de falha, reinicia o bot automaticamente
-   - Envia notificações sobre o status do bot para um grupo designado
-
-## Configuração do Ambiente
-
-### Requisitos
-
-- Python 3.10 ou superior
-- pip (gerenciador de pacotes do Python)
-- Docker (opcional, para uso com containers)
-
-### Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
-
+### Environment Variables
+Create a `.env` file in the project root with these variables:
 ```
-API_ID=seu_api_id
-API_HASH=seu_api_hash
-BOT_TOKEN=seu_bot_token
-NOTIFICATION_CHAT_ID=id_do_chat_para_notificacoes
+API_ID=your_api_id
+API_HASH=your_api_hash
+BOT_TOKEN=your_bot_token
+NOTIFICATION_CHAT_ID=notification_chat_id
 ```
 
-## Executando Localmente
-
-1. Instale as dependências:
-
+## Running Locally
+1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Execute o bot:
-
+2. Run the bot:
 ```bash
 python main.py
 ```
 
-3. Execute o monitor em uma janela separada:
-
+3. Run monitor in a separate window:
 ```bash
 python monitor.py
 ```
 
-## Implantação com Docker
-
-1. Construa a imagem:
-
+## Docker Deployment
+1. Build the image:
 ```bash
 docker-compose build
 ```
 
-2. Inicie o container:
-
+2. Start the container:
 ```bash
 docker-compose up -d
 ```
 
-3. Visualize os logs:
-
+3. View logs:
 ```bash
 docker-compose logs -f
 ```
 
-4. Para parar:
-
+4. Stop:
 ```bash
 docker-compose down
 ```
 
-## Implantação em Servidor Compartilhado (Hostinger)
-
-1. Faça upload de todos os arquivos para o servidor
-
-2. Dê permissão de execução aos scripts:
-
+## Shared Server Deployment (Hostinger)
+1. Upload all files to the server  
+2. Grant execution permissions:
 ```bash
 chmod +x start.sh stop.sh
 ```
-
-3. Inicie o bot:
-
+3. Start the bot:
 ```bash
 ./start.sh
 ```
-
-4. Para parar o bot:
-
+4. Stop the bot:
 ```bash
 ./stop.sh
 ```
 
-## Implantação em VPS com Supervisor
-
-1. Instale o supervisor:
-
+## VPS Deployment with Supervisor
+1. Install supervisor:
 ```bash
 apt-get update && apt-get install -y supervisor
 ```
-
-2. Copie o arquivo de configuração:
-
+2. Copy config file:
 ```bash
 cp supervisor.conf /etc/supervisor/conf.d/telegram-bot.conf
 ```
-
-3. Atualize o diretório no arquivo de configuração se necessário
-
-4. Recarregue o supervisor:
-
+3. Update directory in config if needed  
+4. Reload supervisor:
 ```bash
 supervisorctl reread
 supervisorctl update
 ```
-
-5. Verificar status:
-
+5. Check status:
 ```bash
 supervisorctl status
 ```
 
-## Comandos Úteis
-
-- Ver logs do bot:
-
+## Useful Commands
+- View bot logs:
 ```bash
 tail -f logs/bot.log
 ```
-
-- Ver logs do monitor:
-
+- View monitor logs:
 ```bash
 tail -f logs/monitor.log
 ```
-
-- Verificar processos em execução:
-
+- Check running processes:
 ```bash
 ps aux | grep python
 ```
 
-## Resolução de Problemas
-
-1. **Bot não inicia:** Verifique os logs por erros e confirme se as variáveis de ambiente estão configuradas corretamente.
-
-2. **Erros de conexão com a API do Telegram:** Confirme sua conexão com a internet e valide as credenciais API_ID e API_HASH.
-
-3. **Sessões não persistem:** Certifique-se de que o diretório de sessões tem permissões de escrita.
+## Troubleshooting
+1. **Bot won't start**: Check logs for errors and verify environment variables  
+2. **Telegram API connection errors**: Confirm internet connection and validate API_ID/API_HASH credentials  
+3. **Sessions not persisting**: Ensure the sessions directory has write permissions  
